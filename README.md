@@ -1,6 +1,6 @@
-# AI Receptionist + Calls App — Setup Kit
+# ReceptaBot by JbAI — Setup Kit
 
-This kit gives you:
+ReceptaBot by JbAI was designed by JavaBeanAI. This kit gives you:
 
 1. **An AI receptionist** that answers your phone line with xAI Grok Voice, takes messages ("For: <name>"), flags urgent calls, politely turns away telemarketers with a Do Not Call statement, and handles callers in other languages.
 2. **A private Calls app** (works on phone and computer, can be added to your home screen):
@@ -11,7 +11,7 @@ This kit gives you:
 3. **A call bridge** that sits between Twilio and Grok Voice. It sends incoming calls to your receptionist and places outgoing calls. Its safety rules: STOP/START do-not-contact, calling hours (8am–9pm by default), US numbers only, a monthly budget cap with a warning at 80%, and callbacks to the app number ring your cell for 20 seconds before going to the receptionist.
 
 ```
-receptionist-kit/
+receptabot-kit/
 ├── README.md                       ← you are here
 ├── .env.example                    ← list of every secret you'll set
 ├── .gitignore
@@ -73,7 +73,7 @@ US carriers block business texts from numbers that aren't registered.
 
 ## Step 4 — Deploy the two Workers to Cloudflare
 
-Open Terminal (Mac) or PowerShell (Windows) in the `receptionist-kit` folder.
+Open Terminal (Mac) or PowerShell (Windows) in the `receptabot-kit` folder.
 
 1. Sign in to Cloudflare from the terminal:
    ```
@@ -191,3 +191,9 @@ You can send messages this way with a tool or webhook on your Grok Voice agent (
 - The receptionist and AI caller both tell people the call is recorded. Check your state's recording-consent laws.
 - Calls are limited to US numbers by design.
 - Cost estimates in the app are rough (Grok Voice about $0.095/min, Twilio voice about $0.014/min, texts about $0.0083 each). Check your real bills.
+
+---
+
+## Need help?
+
+Questions about setup, or want it set up for you? Email receptabot@agentmail.to.
