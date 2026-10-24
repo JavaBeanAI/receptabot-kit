@@ -399,4 +399,4 @@ Free to use and modify, including in your own business, but you may not resell i
 
 ## Need help?
 
-Questions about setup, or want it set up for you? Email receptabot@agentmail.to.
+Questions, or want a guided "set up with you" session (remote or in person)? Email receptabot@agentmail.to.
