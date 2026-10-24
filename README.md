@@ -3,12 +3,10 @@
 ReceptaBot by JbAI was designed by JavaBeanAI. This kit gives you:
 
 1. **An AI receptionist** that answers your phone line with xAI Grok Voice, takes messages ("For: <name>"), flags urgent calls, politely turns away telemarketers with a Do Not Call statement, and handles callers in other languages.
-2. **A private Calls app** (works on phone and computer, can be added to your home screen):
-   - Passcode sign-in
-   - A message list, with a separate **Team Messages** section
-   - A **Call screen** with three ways to call: **Call me first** (your cell rings, press 1, you're connected), **Have the AI call** (the AI makes the call for you, or you talk to it first), and **Connect me with…** (the AI calls you, puts you on hold with music, calls the other person, and connects you)
-   - Texting, **Recent Calls** and **Favorites** dropdowns, call recordings, transcripts, and costs
-3. **A call bridge** that sits between Twilio and Grok Voice. It sends incoming calls to your receptionist and places outgoing calls. Its safety rules: STOP/START do-not-contact, calling hours (8am–9pm by default), US numbers only, a monthly budget cap with a warning at 80%, and callbacks to the app number ring your cell for 20 seconds before going to the receptionist.
+2. **A call bridge** that connects that phone line to the receptionist. It is a small program Cloudflare runs for you on the web (this kind of program is called a Worker).
+3. **A Calls app**, if you want it. You can skip it and add it later.
+
+Pick one path below: **Receptionist only**, or **Receptionist + Calls app**.
 
 ```
 receptabot-kit/
@@ -19,7 +17,7 @@ receptabot-kit/
 │   ├── wrangler.toml.example
 │   ├── src/worker.js
 │   └── public/ (index.html, sw.js, manifest, icons)
-├── bridge/                         ← the call bridge (Cloudflare Worker + Durable Object)
+├── bridge/                         ← the call bridge (Cloudflare Worker)
 │   ├── wrangler.toml.example
 │   └── src/index.js, src/app.js
 └── receptionist/
@@ -29,19 +27,147 @@ receptabot-kit/
 
 ---
 
-## What you need first
+## What is the Calls app?
 
-- A computer with **Node.js 20 or newer** (download it from nodejs.org).
-- A **Cloudflare** account (the free plan works): dash.cloudflare.com
-- A **Twilio** account with billing turned on: twilio.com
-- An **xAI** account with API access: console.x.ai
-- About $5–$25 a month for phone numbers, minutes, and texts.
+The Calls app is a private web page. You open it on your phone or computer, and you can add it to your home screen like an app. A passcode keeps other people out.
 
-You'll copy a few values (IDs and keys) from these websites. Keep them in a private note. **Never put a key in a file you share or upload.**
+It shows every message the receptionist took.
+
+It also lets you call from your business number instead of your cell:
+
+- **Call me first** rings your cell. You press 1, and it connects you to the person. They see your business number.
+- **Have the AI call** lets the AI place a call for you and report back.
+- **Connect me with** has the AI call someone, put you on hold with music, and connect you once they answer.
+
+It sends and receives texts from the business number. It keeps Recent Calls, Favorites, recordings, transcripts, and costs.
+
+You do not need the Calls app for the receptionist to work.
 
 ---
 
-## Step 1 — Buy two Twilio phone numbers
+## What you need first
+
+- A computer with **Node.js 22 or newer**. Go to nodejs.org and click the big **LTS** download button, then install it like any other program. To check, open a terminal and run `node -v`. You want v22 or a higher number.
+- A **Cloudflare** account (the free plan works): dash.cloudflare.com
+- A **Twilio** account with billing turned on: twilio.com
+- An **xAI** account with API access: console.x.ai
+- A small monthly budget for phone numbers, minutes, and texts. Check each provider's pricing page for current prices.
+- Your **ReceptaBot** chat in Grok Bot, if you are doing Receptionist only. That chat is where messages show up when you skip the Calls app.
+
+You'll copy a few values (IDs and keys) from these websites. Keep them in a private note. **Never put a key in a file you share or upload.**
+
+First, get the kit: on https://github.com/JavaBeanAI/receptabot-kit click the green **Code** button, then **Download ZIP**. Double-click the ZIP to unpack it. The folder may be called `receptabot-kit-main`; that's fine.
+
+Then open a terminal in that folder:
+
+- **Mac:** open the **Terminal** app, type `cd ` (with a space), drag the folder into the window, and press Return.
+- **Windows:** open the folder, click the address bar, type `powershell`, and press Enter.
+
+A few words this guide uses:
+
+- **E.164** means +1, then the 10 digits, with no spaces or dashes. Example: `+15555550100`.
+- A **SIP address** is an internet address for phone calls. xAI shows it to you.
+- A **webhook** is a web address that receives a call, a text, or a message.
+- **KV** is a simple storage box where the Calls app keeps your messages. Receptionist only does not use it.
+
+---
+
+## Receptionist only
+
+Use this path for one phone number and an AI that answers it. Messages show up in your ReceptaBot chat. You do not deploy the Calls app, and you do not set secrets yet.
+
+The bridge can answer this line with its link to the app left off. Those link lines are the last three lines of `bridge/wrangler.toml` (`[[services]]`, `binding = "APP"`, and `service = ...`). Leave a `#` at the start of each one. The bridge then skips the app. Do not put a `#` on the lines above those three.
+
+### 1. Buy one Twilio number
+
+1. Sign in to console.twilio.com.
+2. In the left menu, click **Phone Numbers → Manage → Buy a number**.
+3. Search your area code, make sure **Voice** and **SMS** are both checked, and click **Buy**.
+4. This number is your **receptionist line**. People call it and the AI answers.
+5. Write it down in E.164 format.
+6. On the Twilio Console home page, copy your **Account SID** (starts with `AC`) and **Auth Token** into your private note. You will not paste them into the bridge until you add the Calls app.
+
+You can skip texting registration for now. Calls work without it. You will need it later if you add the Calls app and want texts to go through.
+
+### 2. Create your Grok Voice receptionist
+
+1. Sign in to console.x.ai and open **Voice → Agents → Create agent**.
+2. Open `receptionist/instructions-template.md` in a text editor. Replace every `{{...}}` with your own details (business name, receptionist name, your name), delete the comment block at the top, and paste the rest into the agent's **Instructions** box.
+3. Paste `receptionist/welcome-message.txt` (with your names filled in) into the **Welcome message** box.
+4. Choose a voice. **Ara** is the default this kit uses.
+5. Under **Phone / Telephony**, connect your receptionist number using xAI's Twilio/SIP option. Your SIP address (an internet address for phone calls; xAI shows it to you) looks like `sip:+15555550100@sip.voice.x.ai;transport=tls`. Write it down.
+
+### 3. Deploy the call bridge
+
+A Worker is a small program Cloudflare runs for you on the web. This step publishes the bridge and nothing else.
+
+1. Sign in to Cloudflare from the terminal:
+   ```
+   npx wrangler login
+   ```
+   A browser window opens. Click **Allow**.
+2. Find your **Account ID**: run `npx wrangler whoami`. It prints a table; copy the long code under **Account ID**.
+3. Make the bridge config file from the template:
+   ```
+   cp bridge/wrangler.toml.example bridge/wrangler.toml
+   ```
+4. Open `bridge/wrangler.toml` in a text editor (TextEdit on Mac, Notepad on Windows). Fill in:
+   - `name` — a short name for the bridge, such as `my-call-bridge` (letters, numbers, and dashes; no `<` or `>`).
+   - `account_id` — the Account ID from the step above.
+   - `RECEPTIONIST_NUMBER` — your receptionist number, in E.164 format.
+   - `RECEPTIONIST_SIP` — the SIP address from step 2.
+5. Put a `#` at the start of these three lines, then save:
+   ```
+   [[services]]
+   binding = "APP"
+   service = ...
+   ```
+   A `#` turns a line into a note, so the bridge does not look for an app. Leave every other line alone. You can leave the other `<...>` values until you add the Calls app.
+6. Deploy the bridge:
+   ```
+   cd bridge
+   npx wrangler deploy
+   ```
+   If this is your first Worker ever, Cloudflare may ask you to pick a **workers.dev subdomain** (any short name). Pick one and continue.
+   The deploy prints a web address ending in `.workers.dev`. Save it. That is your bridge address.
+
+### 4. Point the Twilio number at the bridge
+
+A webhook here is the web address Twilio sends each call to.
+
+In Twilio, go to **Phone Numbers → Manage → Active numbers** and click your receptionist number.
+
+- If the xAI setup in step 2 already connected it, leave the voice settings alone.
+- Otherwise, under **Voice → A call comes in**, choose **Webhook**, enter `https://<your-bridge>.workers.dev/inbound` with method **HTTP POST**, and click **Save**.
+
+Before you change a number that's already in use, take a screenshot of its settings so you can put them back.
+
+### 5. Send messages to your ReceptaBot
+
+The bridge does not store the words the receptionist hears. Your ReceptaBot (a Grok Bot) does, through its message webhook. That webhook is a private web address that wakes the bot when a message arrives.
+
+1. Open your ReceptaBot chat in Grok Bot. Ask it to add a webhook routine that receives receptionist messages and shows them in the chat.
+2. On a computer, open that routine. Under **Webhook**, copy **POST to** and the **key**. The header to send is `Authorization: Bearer` plus that key.
+3. If your xAI plan lets the voice agent call a web address (a tool or webhook), point it at **POST to**. Send the caller's name, callback number, who the message is for, the reason, and whether it is urgent.
+4. When that address answers `200`, the bot accepted the message. Open the ReceptaBot chat to read it. `200` means the bot started, so give it a moment to reply in the chat.
+
+If the voice agent cannot call a web address, ask your ReceptaBot to read new conversations from the xAI console and write the messages into the chat.
+
+### 6. Test
+
+1. Open `https://<your-bridge>.workers.dev/health`. You should see `{"ok": true}`.
+2. From another phone, call your receptionist number, leave a message, and say it's urgent. The AI should answer, take the message, and ask if there's anything else before saying goodbye.
+3. Check your ReceptaBot chat for that message.
+
+Always tell people before you place test calls to them.
+
+---
+
+## Receptionist + Calls app
+
+Use this path when you want the receptionist and the Calls app together. You need two phone numbers.
+
+### 1. Buy two Twilio phone numbers
 
 1. Sign in to console.twilio.com.
 2. In the left menu, click **Phone Numbers → Manage → Buy a number**.
@@ -49,10 +175,10 @@ You'll copy a few values (IDs and keys) from these websites. Keep them in a priv
 4. Buy a second one the same way.
    - **Number A = receptionist line.** People call this one and the AI answers.
    - **Number B = app line.** The Calls app calls and texts from this one.
-5. Write both numbers down in the +1 format, for example `+15555550100`.
+5. Write both numbers down in E.164 format (+1, then the 10 digits, no spaces or dashes), for example `+15555550100`.
 6. On the Twilio Console home page, copy your **Account SID** (starts with `AC`) and **Auth Token** into your private note.
 
-## Step 2 — Register for texting (A2P 10DLC). Start now, because it takes days.
+### 2. Register for texting (A2P 10DLC). Start now, because it takes days.
 
 US carriers block business texts from numbers that aren't registered.
 
@@ -62,53 +188,72 @@ US carriers block business texts from numbers that aren't registered.
 4. Add **both** numbers to the campaign.
 5. Wait. Approval usually takes **a few days, sometimes 1–3 weeks**. Calls work without it. Texts won't work reliably until it's approved.
 
-## Step 3 — Create your Grok Voice receptionist
+### 3. Create your Grok Voice receptionist
 
 1. Sign in to console.x.ai and open **Voice → Agents → Create agent**.
 2. Open `receptionist/instructions-template.md` in a text editor. Replace every `{{...}}` with your own details (business name, receptionist name, your name), delete the comment block at the top, and paste the rest into the agent's **Instructions** box.
 3. Paste `receptionist/welcome-message.txt` (with your names filled in) into the **Welcome message** box.
 4. Choose a voice. **Ara** is the default this kit uses.
-5. Under **Phone / Telephony**, connect **Number A** using xAI's Twilio/SIP option. Your SIP address looks like `sip:+15555550100@sip.voice.x.ai;transport=tls`. Write it down.
+5. Under **Phone / Telephony**, connect **Number A** using xAI's Twilio/SIP option. Your SIP address (an internet address for phone calls; xAI shows it to you) looks like `sip:+15555550100@sip.voice.x.ai;transport=tls`. Write it down.
 6. Go to **API Keys**, create a key, and save it in your private note. You'll use it as `XAI_API_KEY`.
 
-## Step 4 — Deploy the two Workers to Cloudflare
+### 4. Fill in the config files, then create storage
 
-Open Terminal (Mac) or PowerShell (Windows) in the `receptabot-kit` folder.
+Do this from the kit folder you opened above.
 
 1. Sign in to Cloudflare from the terminal:
    ```
    npx wrangler login
    ```
    A browser window opens. Click **Allow**.
-2. Find your **Account ID**: in dash.cloudflare.com, click **Workers & Pages**. It's shown on the right side of that page.
+2. Find your **Account ID**: run `npx wrangler whoami`. It prints a table; copy the long code under **Account ID**.
 3. Make the config files from the templates:
    ```
    cp app/wrangler.toml.example app/wrangler.toml
    cp bridge/wrangler.toml.example bridge/wrangler.toml
    ```
-4. Create the storage the app uses for messages:
+4. Open both `wrangler.toml` files and fill in every `<...>` except the KV id (you get that in the next step):
+   - Your Account ID, your first name, business name, receptionist name, the AI caller name, and both phone numbers (E.164 format).
+   - The bridge's `APP_FROM` and `FROM_NUMBER` are Number B. `RECEPTIONIST_NUMBER` is Number A. `RECEPTIONIST_SIP` is the SIP address from step 3.
+   - Pick a short name for each Worker (letters, numbers, and dashes). The app's `service` line must match the bridge's `name`, and the bridge's `service` line must match the app's `name`.
+5. In `bridge/wrangler.toml`, put a `#` at the start of the last three lines (`[[services]]`, `binding = "APP"`, `service = ...`). Save. Those lines are the link to the app. The bridge has to go up once without that link, because the app does not exist yet.
+6. Create the storage the app uses for messages. KV is a simple storage box. Your terminal must be in the kit folder, and the app's `name` must already be filled in (the command fails while the name still has `<...>` in it):
    ```
    cd app
    npx wrangler kv namespace create DB
    ```
-   Copy the `id` it prints into `app/wrangler.toml`.
-5. Open both `wrangler.toml` files and fill in every `<...>`:
-   - Account ID, names, and both phone numbers.
-   - The bridge's `APP_FROM` and `FROM_NUMBER` are Number B. `RECEPTIONIST_NUMBER` is Number A. `RECEPTIONIST_SIP` is the SIP address from Step 3.
-   - Pick a name for each Worker. The app's `[[services]] service` must match the bridge's `name`, and the bridge's must match the app's `name`.
-6. Deploy the bridge first, then the app:
-   ```
-   cd ../bridge && npx wrangler deploy
-   cd ../app && npx wrangler deploy
-   ```
-   (The first deploy of each may warn that the other Worker doesn't exist yet. Deploy both, then deploy the bridge once more.)
-   Each deploy prints a web address ending in `.workers.dev`. Save both. The app's address is what you open on your phone.
+   Copy the long `id` it prints and paste it in place of `<KV_NAMESPACE_ID>` in `app/wrangler.toml`. Save.
 
-## Step 5 — Set the secrets
+### 5. Deploy in three short steps
 
-`.env.example` lists every secret. Make the random ones with `openssl rand -hex 32` (Mac), or any password generator that gives 64 random letters and numbers.
+The app and bridge link to each other, so the bridge has to go up once without that link. Your terminal is inside the `app` folder from the last step.
+
+1. Deploy the bridge, then the app:
+   ```
+   cd ../bridge
+   npx wrangler deploy
+   cd ../app
+   npx wrangler deploy
+   ```
+2. Remove the three `#` marks you added in `bridge/wrangler.toml`, save, and deploy the bridge again:
+   ```
+   cd ../bridge
+   npx wrangler deploy
+   ```
+3. If this is your first Worker ever, Cloudflare may ask you to pick a **workers.dev subdomain** (any short name). Pick one and continue.
+
+Each deploy prints a web address ending in `.workers.dev`. Save both. The app's address is what you open on your phone.
+
+### 6. Set the secrets
+
+`.env.example` lists every secret.
+
+`OWNER_CELL` is your own cell number in E.164 format. `APP_PASSCODE` is the passcode you will type to open the app. `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `XAI_API_KEY` are the values you copied from Twilio and xAI.
+
+For `BRIDGE_TOKEN`, `INGEST_TOKEN`, and `SESSION_KEY` you need long random passwords. On Mac, run `openssl rand -hex 32`. On Windows, use any password generator set to 64 letters and numbers. Make each one once and keep it in your private note, because `BRIDGE_TOKEN` and `INGEST_TOKEN` get typed in twice. When `secret put` asks for a value, paste it and press Enter. Nothing shows as you type. That is normal.
 
 From the `bridge` folder, run each line and paste the value when it asks:
+
 ```
 npx wrangler secret put TWILIO_ACCOUNT_SID
 npx wrangler secret put TWILIO_AUTH_TOKEN
@@ -117,7 +262,9 @@ npx wrangler secret put BRIDGE_TOKEN
 npx wrangler secret put INGEST_TOKEN
 npx wrangler secret put OWNER_CELL
 ```
+
 From the `app` folder:
+
 ```
 npx wrangler secret put APP_PASSCODE
 npx wrangler secret put SESSION_KEY
@@ -125,13 +272,16 @@ npx wrangler secret put BRIDGE_TOKEN
 npx wrangler secret put INGEST_TOKEN
 npx wrangler secret put OWNER_CELL
 ```
+
 `BRIDGE_TOKEN`, `INGEST_TOKEN`, and `OWNER_CELL` must be **the same** in both places.
 
-## Step 6 — Point the Twilio numbers at the bridge
+### 7. Point the Twilio numbers at the bridge
+
+A webhook is the web address Twilio sends each call or text to.
 
 In Twilio, go to **Phone Numbers → Manage → Active numbers** and click a number.
 
-- **Number A (receptionist)**: if the xAI setup in Step 3 already connected it, leave it alone. Otherwise, under **Voice → A call comes in**, choose **Webhook**, enter `https://<your-bridge>.workers.dev/inbound` with method **HTTP POST**, and click **Save**.
+- **Number A (receptionist)**: if the xAI setup in step 3 already connected it, leave it alone. Otherwise, under **Voice → A call comes in**, choose **Webhook**, enter `https://<your-bridge>.workers.dev/inbound` with method **HTTP POST**, and click **Save**.
 - **Number B (app line)**:
   - Voice → A call comes in → Webhook: `https://<your-bridge>.workers.dev/a/voice` (HTTP POST)
   - Messaging → A message comes in → Webhook: `https://<your-bridge>.workers.dev/a/sms` (HTTP POST)
@@ -139,7 +289,11 @@ In Twilio, go to **Phone Numbers → Manage → Active numbers** and click a num
 
 Before you change a number that's already in use, take a screenshot of its settings so you can put them back.
 
-## Step 7 — Test
+### 8. Send receptionist messages to the app
+
+The bridge adds outgoing calls, texts, and callbacks to the app on its own. Messages the receptionist takes on incoming calls are not in the bridge. Point the voice agent's tool or webhook at the app, using the steps in **How messages get into the app** below.
+
+### 9. Test
 
 1. Open `https://<your-bridge>.workers.dev/health`. You should see `{"ok": true}`.
 2. Open the app address on your phone, enter your passcode, and add it to your home screen.
@@ -153,27 +307,72 @@ Always tell people before you place test calls or texts to them.
 
 ---
 
+## Add the Calls app later
+
+Start here if the receptionist is already working and you now want the Calls app. Your bridge is already deployed, with the three app-link lines still turned off (`#` at the start).
+
+1. Buy a second Twilio number the same way as the first. This is **Number B**, the app line. Keep your receptionist number as Number A. Write Number B in E.164 format.
+2. If you want texts, start **A2P 10DLC** now (see step 2 under Receptionist + Calls app). Add **both** numbers to the campaign. Calls work while you wait. Texts wait until it is approved.
+3. Open a terminal in the kit folder (the same folder as the first time).
+4. Open `bridge/wrangler.toml`. Set `APP_FROM` and `FROM_NUMBER` to Number B. Leave the three `#` lines in place until the app deploy below has finished. The bridge can link to the app only after the app exists.
+5. Make the app config and fill it in, except the KV id:
+   ```
+   cp app/wrangler.toml.example app/wrangler.toml
+   ```
+   Fill in your Account ID, names, Number B, and the bridge's `name` on the app's `service` line. Pick a short `name` for the app.
+6. Create storage, then deploy the app. From the kit folder:
+   ```
+   cd app
+   npx wrangler kv namespace create DB
+   ```
+   Copy the long `id` it prints and paste it in place of `<KV_NAMESPACE_ID>` in `app/wrangler.toml`. Save. Then:
+   ```
+   npx wrangler deploy
+   ```
+   Save the app address (it ends in `.workers.dev`).
+7. Turn the bridge link back on. In `bridge/wrangler.toml`, remove the three `#` marks. Set that `service` line to the app's `name`. Save, and deploy the bridge again:
+   ```
+   cd ../bridge
+   npx wrangler deploy
+   ```
+8. Set the secrets. Use the same list as step 6 under Receptionist + Calls app, including the random passwords and the note that pasted values do not show as you type. Set them on the bridge and on the app. `BRIDGE_TOKEN`, `INGEST_TOKEN`, and `OWNER_CELL` must match in both places. You also need `XAI_API_KEY` from console.x.ai if you did not create one yet.
+9. Point **Number B** at the bridge:
+   - Voice → A call comes in → Webhook: `https://<your-bridge>.workers.dev/a/voice` (HTTP POST)
+   - Messaging → A message comes in → Webhook: `https://<your-bridge>.workers.dev/a/sms` (HTTP POST)
+   Leave Number A as it is.
+10. Switch message delivery to the app, or send to both places.
+   - **App:** point the voice agent tool at `https://<your-app>.workers.dev/api/messages` with `Authorization: Bearer` and your `INGEST_TOKEN`. Details are in **How messages get into the app**.
+   - **Both:** if the tool can call two addresses, keep the ReceptaBot webhook and also call the app address. The Calls app then shows the message, and your ReceptaBot chat still gets it.
+11. Open the app on your phone, enter the passcode, and add it to your home screen. Then run the tests in step 9 under Receptionist + Calls app.
+
+---
+
 ## How messages get into the app
 
-The bridge adds outgoing calls, texts, and callbacks to the app on its own. Messages your **receptionist** takes on incoming calls must be sent to the app's ingest address:
+Use this with **Receptionist + Calls app**, or after **Add the Calls app later**. Receptionist only uses your ReceptaBot webhook instead.
+
+The bridge adds outgoing calls, texts, and callbacks to the app on its own. Messages your **receptionist** takes on incoming calls must be sent to the app's message address:
 
 ```
 POST https://<your-app>.workers.dev/api/messages
 Authorization: Bearer <INGEST_TOKEN>
 Content-Type: application/json
-User-Agent: anything-custom/1.0      (needed: Cloudflare blocks some default user agents)
+User-Agent: anything-custom/1.0      (recommended: some tools' default user agents get blocked)
 
 {"name":"Jane Doe","callback":"+15555551234","reason":"Wants a quote",
  "details":"For: Sam — full message…","urgency":"urgent|normal","language":"English",
  "time":"2026-01-01T10:00:00-05:00","conversation_id":"<xAI conversation id, optional>"}
 ```
+
 - Add `"line":"team"` and `"for":"<name>"` to put a message in **Team Messages**.
 - Sending the same `id` again updates the existing entry.
 - `DELETE /api/messages/<id>` with the same token removes an entry.
 
-You can send messages this way with a tool or webhook on your Grok Voice agent (if your xAI plan offers one), a small scheduled script that reads new conversations from the xAI console API, or an AI assistant routine.
+You can send messages this way with a tool or webhook on your Grok Voice agent (if your xAI plan offers one). To also notify your ReceptaBot, send the same message to that bot's webhook.
 
 ## Settings you can change later (in `bridge/wrangler.toml`, then `npx wrangler deploy`)
+
+These limits apply when the Calls app places calls and texts. The receptionist can still answer incoming calls.
 
 | Setting | What it does | Default |
 |---|---|---|
