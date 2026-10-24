@@ -1,0 +1,35 @@
+# Copy to wrangler.toml and fill in the <...> values.
+name = "<your-bridge-name>"         # e.g. "my-call-bridge"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+account_id = "<YOUR_CLOUDFLARE_ACCOUNT_ID>"
+workers_dev = true
+
+[vars]
+OWNER_NAME = "<Your first name>"
+BUSINESS_NAME = "<Your business name>"
+AI_CALLER_NAME = "<AI caller name>"
+AI_VOICE = "ara"                    # xAI voice for calls and spoken lines (default: ara)
+APP_FROM = "<+15555550101>"         # Twilio number the app calls/texts from (E.164)
+FROM_NUMBER = "<+15555550101>"      # caller ID for API-placed /call requests (usually same as APP_FROM)
+RECEPTIONIST_NUMBER = "<+15555550100>"   # your receptionist line, so the app never calls it
+RECEPTIONIST_SIP = "sip:<+15555550100>@sip.voice.x.ai;transport=tls"   # SIP address of your Grok Voice agent
+TIMEZONE = "America/New_York"
+CALL_HOURS_START = "8"              # no outgoing calls before 8am local
+CALL_HOURS_END = "21"               # ...or after 9pm local
+MAX_CALLS_DAY = "10"
+MAX_MONTH_USD = "20"                # monthly spending cap; warning shows at 80%
+HEADSUP_SMS = "off"                 # "on" = text your cell about replies and the budget warning
+# OWNER_CELL is a secret: npx wrangler secret put OWNER_CELL
+
+[[durable_objects.bindings]]
+name = "CALLS"
+class_name = "CallHub"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["CallHub"]
+
+[[services]]
+binding = "APP"
+service = "<your-app-name>"         # must match name in app/wrangler.toml

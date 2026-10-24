@@ -1,0 +1,184 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Calls</title><link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Calls"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2563eb">
+<style>
+*{box-sizing:border-box}body{margin:0;font:17px -apple-system,system-ui,sans-serif;background:#f5f7fb;color:#111}
+header{position:sticky;top:0;background:#2563eb;color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;z-index:2}
+h1{margin:0 0 8px;font-size:22px}.sub{font-size:13px;opacity:.85}
+.bar{display:flex;gap:8px;margin-top:10px}input[type=search]{flex:1;padding:10px 12px;border-radius:10px;border:0;font-size:16px}
+.chips{display:flex;gap:6px;padding:10px 16px;flex-wrap:wrap}.chip{border:1px solid #cbd5e1;background:#fff;border-radius:20px;padding:6px 14px;font-size:15px}
+.chip.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
+main{padding:0 12px 40px}.card{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 1px 3px #0001;border-left:5px solid #cbd5e1}
+.card.urgent{border-left-color:#dc2626;background:#fff5f5}.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.name{font-weight:600;font-size:18px}.time{font-size:13px;color:#555;white-space:nowrap}.reason{margin:6px 0;color:#333}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:8px;background:#e2e8f0;margin-right:4px}.tag.u{background:#dc2626;color:#fff}.tag.t{background:#fde68a}.tag.o{background:#7c3aed;color:#fff}.card.out{border-left-color:#7c3aed}.chat{margin-top:8px}.bub{padding:8px 12px;border-radius:12px;margin:6px 0;max-width:88%;white-space:pre-wrap}.bub.ai{background:#ede9fe}.bub.them{background:#fff;margin-left:auto;border:1px solid #e2e8f0}.bub b{display:block;font-size:12px;color:#555}
+a.tel{color:#2563eb;text-decoration:none;font-weight:500}.empty{text-align:center;color:#666;padding:40px}
+#detail{position:fixed;inset:0;background:#f5f7fb;overflow:auto;display:none;z-index:5;padding:calc(env(safe-area-inset-top) + 12px) 16px 40px}
+.btn{display:block;width:100%;text-align:center;padding:14px;border-radius:12px;font-size:17px;text-decoration:none;margin:10px 0;border:0}
+.primary{background:#2563eb;color:#fff}.green{background:#16a34a;color:#fff}.plain{background:#e2e8f0;color:#111}
+dl dt{font-size:13px;color:#666;margin-top:12px}dl dd{margin:2px 0 0;white-space:pre-wrap}
+#login{max-width:360px;margin:60px auto;padding:20px;text-align:center}#login input{width:100%;padding:14px;font-size:22px;text-align:center;border-radius:12px;border:1px solid #cbd5e1;letter-spacing:6px}
+.small{font-size:13px;color:#666}
+.mode{display:block;background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:12px;margin:8px 0}.mode.on{border-color:#16a34a;background:#f0fdf4}.mode b{display:block}
+#cs input[type=tel],#cs input[type=text],#cs textarea{width:100%;padding:12px;font-size:18px;border-radius:10px;border:1px solid #cbd5e1;margin:4px 0}.dd{display:flex;gap:8px;margin:6px 0}.ddb{flex:1;padding:12px 8px;font-size:16px;font-weight:600;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#111}.ddb.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}.rw{display:flex;border-top:1px solid #e2e8f0}.rw:first-child{border-top:0}.rw .rr{flex:1;border-top:0}.st{border:0;background:#fff;font-size:24px;padding:0 16px;color:#d97706;min-width:52px}.recd{margin:6px 0;overflow:hidden;background:#fff;border:1px solid #cbd5e1;border-radius:10px}.recd summary{padding:12px;font-size:16px;font-weight:600;cursor:pointer}.recd .rr{display:block;width:100%;text-align:left;border:0;border-top:1px solid #e2e8f0;background:#fff;padding:12px;font-size:16px;color:#111}.recd .rr:active{background:#f1f5f9}.recd .rr span{display:block;font-size:14px;color:#555}#mdl{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px}#mdl .bx{background:#fff;color:#111;border-radius:18px;padding:24px 20px calc(env(safe-area-inset-bottom) + 16px);width:100%;max-width:440px;font-size:18px}#mdl h2{margin:0 0 6px;font-size:28px;line-height:1.2;word-break:break-word}#mdl .num{font-size:21px;color:#1e293b;margin-bottom:14px}#mdl .ln{font-size:19px;margin:10px 0;line-height:1.35}#mdl .pv{background:#f1f5f9;border-radius:12px;padding:12px;font-size:18px;white-space:pre-wrap;max-height:30vh;overflow:auto;margin:10px 0}#mdl .ft{font-size:15px;color:#64748b;margin:10px 0 16px}#mdl .btn{font-size:20px;font-weight:600;padding:16px;margin:8px 0}#mdl .gray{background:#e2e8f0;color:#111}
+.err{color:#dc2626;font-weight:600}.ok{color:#15803d;font-weight:600}.warn{background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:10px;margin:8px 0}
+</style></head><body>
+<div id="login" hidden><h1 style="color:#2563eb">Calls</h1><p>Enter your passcode to see your messages.</p>
+<form method="post" action="/api/login"><input name="passcode" inputmode="numeric" autocomplete="one-time-code" required><button class="btn primary">Open</button></form><p id="bad" class="small" style="color:#dc2626" hidden>That passcode didn't work. Try again.</p></div>
+<div id="app" hidden>
+<header><h1>Calls</h1><div class="sub" id="subline"></div>
+<div class="bar"><input id="q" type="search" placeholder="Search name, number, reason, summary"><button class="chip" id="callbtn" style="background:#16a34a;color:#fff;border:0;font-weight:600">📞 Call / Text</button></div><div id="budget" class="sub" style="margin-top:6px"></div></header>
+<div class="chips"><button class="chip on" data-f="all">Any</button><button class="chip" data-f="urgent">Urgent</button><button class="chip" data-f="normal">Normal</button><button class="chip" data-d="all" style="margin-left:8px" >All calls</button><button class="chip" data-d="incoming">Incoming</button><button class="chip" data-d="outgoing">Outgoing</button><button class="chip" data-d="team">👥 Team Messages</button><button class="chip" data-d="text">💬 Texts</button><button class="chip" id="tests">Show test calls</button><button class="chip" id="costs">💲 Costs</button></div>
+<main id="list"></main>
+<p class="small" style="text-align:center"><a id="convlink" href="https://console.x.ai" target="_blank">Recordings are in the xAI console</a> · <a href="/api/logout">Sign out</a></p>
+</div>
+<div id="detail"></div>
+<script src="/config.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{document.title=CFG.app;document.querySelectorAll("h1").forEach(h=>h.textContent=CFG.app);const cl=document.getElementById("convlink");if(cl&&CFG.conv)cl.href=CFG.conv;const sl=document.getElementById("subline");if(sl)sl.textContent=`Calls in and out · ${CFG.rec}${CFG.line?" on "+CFG.line:""} and ${CFG.ai}`;});
+const dur=s=>{s=+s||0;return s<60?s+" sec":Math.floor(s/60)+" min "+(s%60)+" sec"};
+function openOut(m,d){d.innerHTML=`<button class="btn plain" id="back">‹ Back</button><h1>${esc(m.name)}</h1>
+ <span class="tag o">Outgoing</span>${m.is_test?'<span class="tag t">test call</span>':""}
+ ${m.to&&m.to!=CFG.owner_cell?`<button class="btn green" onclick="callScreen('${esc(m.to)}','')">↩︎ Call ${esc(fmtNum(m.to))} again from the app</button>`:""}
+ <dl><dt>When</dt><dd>${fmtTime(m.time)}</dd><dt>Who was called</dt><dd>${esc(fmtNum(m.to))}</dd>
+ ${m.summary?`<dt>Summary</dt><dd>${esc(m.summary)}</dd>`:""}
+ <dt>Purpose</dt><dd>${esc(m.purpose)}</dd>
+ <dt>Length · Status · Est. cost</dt><dd>${dur(m.seconds)} · ${esc(m.status||"?")} · ${m.est_cost!=null?"$"+(+m.est_cost).toFixed(2):"?"}</dd></dl>
+ ${m.recording&&/^CA[0-9a-f]{32}$/.test(m.sid||"")?`<h3>🎧 Recording</h3><audio id="rec" controls preload="metadata" style="width:100%" src="/api/recording/${m.sid}"></audio>${m.linked_sid&&/^CA[0-9a-f]{32}$/.test(m.linked_sid)?`<h3>🎧 Your instruction call</h3><audio controls preload="none" style="width:100%" src="/api/recording/${m.linked_sid}"></audio>`:""}<div class="small" style="margin:6px 0"><label><input type="radio" name="vmode" value="both" checked> Both voices</label> &nbsp; <label><input type="radio" name="vmode" value="other"> Other person only</label></div>`:""}
+ <h3>Transcript</h3><div class="chat">${(m.transcript||[]).map(t=>{const ai=/^ai$/i.test(t.who);return `<div class="bub ${ai?"ai":"them"}"><b>${ai?CFG.ai:"Them"}</b>${esc(t.text)}</div>`}).join("")||'<p class="small">No transcript.</p>'}</div>
+ ${m.sid?`<p class="small"><a href="https://console.twilio.com/us1/monitor/logs/calls/${encodeURIComponent(m.sid)}" target="_blank">Twilio call log</a>${m.recording?"":" (no recording kept)"}</p>`:""}`;
+ d.style.display="block";d.scrollTop=0;$("#back").onclick=()=>{const a=$("#rec");if(a)a.pause();d.style.display="none"};curThem=m.them_ch==1?1:0;setupRec();}
+let actx=null,vmode="both",curThem=0;
+function setupRec(){const a=$("#rec");if(!a)return;let g1=null,wired=false;
+ const apply=()=>{if(g1)g1.gain.value=vmode=="other"?0:0.6};
+ document.querySelectorAll('input[name=vmode]').forEach(r=>{r.checked=r.value==vmode;r.onchange=()=>{vmode=r.value;apply()}});
+ a.addEventListener("play",()=>{try{
+  if(!wired){wired=true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+   actx=actx||new AC();const src=actx.createMediaElementSource(a),sp=actx.createChannelSplitter(2),
+   g0=actx.createGain(),mix=actx.createGain();g1=actx.createGain();g0.gain.value=1.8;
+   mix.channelCount=1;mix.channelCountMode="explicit";mix.channelInterpretation="speakers";
+   src.connect(sp);if(curThem==1){sp.connect(g1,0);sp.connect(g0,1)}else{sp.connect(g0,0);sp.connect(g1,1)}g0.connect(mix);g1.connect(mix);mix.connect(actx.destination);apply();}
+  if(actx&&actx.state=="suspended")actx.resume();
+ }catch(e){console.warn("Web Audio off, plain playback",e)}});}
+const $=s=>document.querySelector(s);let all=[],f="all",dir="all",showTests=false;
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtNum=n=>{const d=String(n||"").replace(/\D/g,"").replace(/^1(?=\d{10}$)/,"");return d.length==10?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:n||""};
+const tel=n=>{const d=String(n||"").replace(/\D/g,"");return d?`tel:+${d.length==10?"1"+d:d}`:""};
+const CONV=CFG.conv||"https://console.x.ai";
+const CONV_T=CFG.convTeam||CONV;
+const callUrl=m=>{const b=m.line=="team"?CONV_T:CONV;return m.conversation_id?b+"&conversation="+encodeURIComponent(m.conversation_id):b};const _old=m=>m.conversation_id?CONV+"&conversation="+encodeURIComponent(m.conversation_id):CONV;
+const fmtClock=t=>new Date(t).toLocaleString("en-US",{timeZone:CFG.tz,hour:"numeric",minute:"2-digit"})+" "+CFG.tzl;
+const fmtTime=t=>new Date(t).toLocaleString("en-US",{timeZone:CFG.tz,weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})+" "+CFG.tzl;
+function render(){const q=$("#q").value.toLowerCase();
+ const rows=all.filter(m=>(showTests||!m.is_test)&&(f=="all"||m.urgency==f)&&(dir=="team"?m.line=="team":dir=="text"?m.line=="text":(m.line!="team"&&(dir=="all"||(dir=="outgoing"&&m.line!="text"?m.direction=="outgoing":dir=="incoming"?(m.direction||"incoming")=="incoming"&&m.line!="text":dir=="all"))))&&(!q||[m.name,m.callback,m.called_from,m.reason,m.details,m.to,m.purpose,m.summary,m.for].join(" ").toLowerCase().includes(q)));
+ $("#list").innerHTML=rows.length?rows.map(m=>`<div class="card ${m.urgency=="urgent"?"urgent":""} ${m.direction=="outgoing"?"out":""}" data-id="${esc(m.id)}">
+ <div class="row"><span class="name">${esc(m.name)}</span><span class="time">${fmtTime(m.time)}</span></div>
+ ${m.line=="team"?`<div class="reason"><b>For: ${esc(m.for)}</b></div>`:""}<div class="reason">${esc(m.line=="text"?m.details:m.reason)}</div>${m.line=="team"&&m.summary?`<div class="small">${esc(m.summary)}</div>`:""}
+ <div class="row"><span>${m.callback?`<a class="tel" href="${tel(m.callback)}" onclick="event.stopPropagation()">📞 ${esc(fmtNum(m.callback))}</a> <button class="chip" style="padding:3px 10px;font-size:13px" onclick="event.stopPropagation();callScreen('${esc(m.callback)}','${esc(m.line=="text"?"":m.name)}')">↩︎ Call back</button>`:m.direction=="outgoing"&&m.to&&m.to!=CFG.owner_cell?`<button class="chip" style="padding:3px 10px;font-size:13px" onclick="event.stopPropagation();callScreen('${esc(m.to)}','')">↩︎ Call again</button>`:""}</span>
+ <span>${m.urgency=="urgent"?'<span class="tag u">URGENT</span>':""}${m.is_test?'<span class="tag t">test</span>':""}${m.line=="text"?`<span class="tag">💬 text ${m.direction=="outgoing"?"sent":"received"}</span>`:m.line=="alert"?'<span class="tag">🔔 reminder</span>':m.direction=="outgoing"?`<span class="tag o">Outgoing</span>${m.recording?'<span class="tag">🎧</span>':""}<span class="tag">${dur(m.seconds)}</span>`:`<span class="tag">${/^(yes|sent)/i.test(m.email_status)?"✉️ emailed":"✉️ not emailed"}</span>`}</span></div></div>`).join(""):'<div class="empty">No messages match.</div>';
+ document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id));}
+function open(id){const m=all.find(x=>x.id==id);if(!m)return;const d=$("#detail");if(m.direction=="outgoing"&&m.line!="text")return openOut(m,d);
+ d.innerHTML=`<button class="btn plain" id="back">‹ Back</button><h1>${esc(m.name)}</h1>
+ ${m.urgency=="urgent"?'<span class="tag u">URGENT</span>':'<span class="tag">Normal</span>'}${m.is_test?'<span class="tag t">test call</span>':""}
+ ${m.callback?`<button class="btn green" onclick="callScreen('${esc(m.callback)}','${esc(m.line=="text"?"":m.name)}')">↩︎ Call back ${esc(fmtNum(m.callback))} from the app</button><a class="btn plain" href="${tel(m.callback)}">📞 Call from my phone</a>`:""}
+ <a class="btn primary" href="${callUrl(m)}" target="_blank">${m.conversation_id?"🎧 Listen / full call":`🎧 Find call in list (around ${fmtClock(m.time)})`}</a>
+ <dl>${m.line=="team"?`<dt>For</dt><dd>${esc(m.for)}</dd>`:""}<dt>When</dt><dd>${fmtTime(m.time)}</dd><dt>Reason</dt><dd>${esc(m.reason)}</dd>
+ ${m.summary&&m.line=="team"?`<dt>Summary</dt><dd>${esc(m.summary)}</dd>`:""}${m.details?`<dt>Full message</dt><dd>${esc(m.details)}</dd>`:""}
+ ${m.called_from?`<dt>Called from</dt><dd>${esc(fmtNum(m.called_from))}</dd>`:""}
+ ${m.language?`<dt>Language</dt><dd>${esc(m.language)}</dd>`:""}
+ <dt>Email</dt><dd>${esc(m.email_status||"unknown")}</dd></dl>
+ ${m.conversation_id?"":`<p class="small">Look for the call at ${fmtTime(m.time)} in ${m.line=="team"?"the team receptionist's":CFG.rec+"'s"} conversations list.</p>`}`;
+ d.style.display="block";d.scrollTop=0;$("#back").onclick=()=>d.style.display="none";}
+document.querySelectorAll("[data-d]").forEach(b=>{b.classList.toggle("on",b.dataset.d=="all");b.onclick=()=>{dir=b.dataset.d;document.querySelectorAll("[data-d]").forEach(x=>x.classList.toggle("on",x==b));render()}});
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{f=b.dataset.f;document.querySelectorAll("[data-d]").forEach(b=>{b.classList.toggle("on",b.dataset.d=="all");b.onclick=()=>{dir=b.dataset.d;document.querySelectorAll("[data-d]").forEach(x=>x.classList.toggle("on",x==b));render()}});
+document.querySelectorAll("[data-f]").forEach(x=>x.classList.toggle("on",x==b));render()});
+
+const XAI_RATE=0.08; // $/min, Grok Voice speech-to-speech, docs.x.ai/developers/models
+const money=n=>"$"+(+n||0).toFixed(2);
+const monKey=t=>{const p=new Intl.DateTimeFormat("en-US",{timeZone:CFG.tz,year:"numeric",month:"2-digit"}).formatToParts(new Date(t));return p.find(x=>x.type=="year").value+"-"+p.find(x=>x.type=="month").value};
+const monName=k=>new Date(k+"-15T12:00:00Z").toLocaleString("en-US",{month:"long",year:"numeric"});
+const inCost=m=>m.seconds>0?Math.round(m.seconds/60*XAI_RATE*1000)/1000:null;
+function months(){const g={};for(const m of all){const k=monKey(m.time);(g[k]=g[k]||{k,out:0,outN:0,inc:0,incN:0,incKnown:0,calls:[]});const x=g[k];x.calls.push(m);
+ if(m.line=="text"){x.txN=(x.txN||0)+1;x.tx=(x.tx||0)+(+m.est_cost||0)}else if(m.line=="alert"){}else if(m.direction=="outgoing"){x.outN++;x.out+=+m.est_cost||0}else{x.incN++;const c=inCost(m);if(c!=null){x.incKnown++;x.inc+=c}}}
+ return Object.values(g).sort((a,b)=>b.k.localeCompare(a.k))}
+function showCosts(){const d=$("#detail"),cur=monKey(Date.now());
+ d.innerHTML=`<button class="btn plain" id="back">‹ Back</button><h1>💲 Costs by month</h1><p class="small">All amounts are estimates. Test calls are included because they cost money too. Tap a month to see its calls.</p>`+
+ months().map(x=>`<div class="card" data-mk="${x.k}"><div><b>${monName(x.k)}</b>${x.k==cur?' <span class="tag">so far</span>':""}</div>
+ <div style="font-size:1.5em;margin:4px 0">${money(x.out+x.inc+(x.tx||0))}${x.incKnown<x.incN?'<span class="small"> + incoming not tracked yet</span>':""}</div>
+ <div class="small">Outgoing (estimated): ${money(x.out)} · ${x.outN} call${x.outN==1?"":"s"}<br>Texts: ${money(x.tx||0)} · ${x.txN||0} text${x.txN==1?"":"s"}<br>Incoming: ${x.incN?(x.incKnown?money(x.inc)+" estimate"+(x.incKnown<x.incN?` (${x.incKnown} of ${x.incN} calls timed)`:""):"not tracked yet")+` · ${x.incN} call${x.incN==1?"":"s"}`:"$0.00 · 0 calls"}</div></div>`).join("");
+ d.style.display="block";d.scrollTop=0;$("#back").onclick=()=>d.style.display="none";
+ d.querySelectorAll("[data-mk]").forEach(c=>c.onclick=()=>showMonth(c.dataset.mk));}
+function showMonth(k){const d=$("#detail"),x=months().find(y=>y.k==k);
+ d.innerHTML=`<button class="btn plain" id="back">‹ Costs</button><h1>${monName(k)}</h1>`+x.calls.sort((a,b)=>b.time.localeCompare(a.time)).map(m=>{const o=m.direction=="outgoing"||m.line=="text",c=o?(m.est_cost==null?null:+m.est_cost):inCost(m);
+ return `<div class="card ${o?"out":""}"><div style="display:flex;justify-content:space-between"><b>${esc(m.name)}</b><b>${c==null?'<span class="small">not tracked yet</span>':money(c)}</b></div>
+ <div class="small">${fmtTime(m.time)}${m.seconds?" · "+dur(m.seconds):""} · ${o?'<span class="tag o">Outgoing</span> estimated':'Incoming'+(c!=null?" estimate":"")}${m.is_test?' <span class="tag t">test call</span>':""}</div></div>`}).join("");
+ d.scrollTop=0;$("#back").onclick=showCosts;}
+$("#costs").onclick=showCosts;
+let line={budget:{spent:0,cap:20},dnc:[]};
+async function loadLine(){try{const r=await fetch("/api/line");if(r.ok)line=await r.json();}catch{}const b=line.budget||{};
+ $("#budget").innerHTML=b.cap?`Calls & texts this month: $${(+b.spent).toFixed(2)} of $${b.cap}${b.alert?' · ⚠️ close to the monthly budget':""}`:"";}
+const e164=n=>{const d=String(n||"").replace(/\D/g,"");return d.length==10?"+1"+d:d.length==11&&d[0]=="1"?"+"+d:""};
+function recent(){const seen=new Set(),out=[];for(const m of all){for(const n of [m.direction=="outgoing"?m.to:m.callback]){const e=e164(n);if(e&&e!=CFG.owner_cell&&!seen.has(e)){seen.add(e);out.push({n:e,name:m.line=="text"||(/^(Call to|Text)/.test(m.name)||m.name.startsWith(CFG.ai))?"":m.name})}}if(out.length>=8)break}return out}
+let cmode="me-first",favs=[];
+function ask(o){return new Promise(res=>{const m=document.createElement("div");m.id="mdl";
+ m.innerHTML=`<div class="bx" role="dialog" aria-modal="true"><h2>${esc(o.title)}</h2>${o.num?`<div class="num">${esc(o.num)}</div>`:""}${o.line?`<div class="ln">${esc(o.line)}</div>`:""}${o.preview?`<div class="pv">${esc(o.preview)}</div>`:""}<div class="ft">${esc(o.foot||"")}</div><button class="btn ${o.okc||"green"}" id="mok">${esc(o.ok)}</button><button class="btn gray" id="mno">Cancel</button></div>`;
+ const done=v=>{m.remove();res(v)};m.onclick=e=>{if(e.target==m)done(false)};document.body.appendChild(m);m.querySelector("#mok").onclick=()=>done(true);m.querySelector("#mno").onclick=()=>done(false);})}
+function callScreen(num,name){const d=$("#detail");const b=line.budget||{};
+ d.innerHTML=`<button class="btn plain" id="back">‹ Back</button><div id="cs"><h1>📞 Call or text</h1>
+ <p class="small">From the app number ${fmtNum(line.from||CFG.from)}. Calls are recorded.</p>
+ ${b.alert?`<div class="warn">⚠️ You've used $${(+b.spent).toFixed(2)} of your $${b.cap} monthly budget.</div>`:""}
+ <label class="small">Name (optional)</label><input id="cname" type="text" autocomplete="name" autocapitalize="words" value="${esc(name||"")}">
+ <label class="small">Number (paste or type)</label><input id="cnum" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 555-1234" value="${esc(fmtNum(num||""))}">
+ <div class="dd"><button type="button" class="ddb" data-p="rec8">Recent Calls ▾</button><button type="button" class="ddb" data-p="fav8">★ Favorites ▾</button></div><div id="rec8" class="recd" hidden></div><div id="fav8" class="recd" hidden></div>
+ <div id="dncnote"></div>
+ <h3>How should I call?</h3>
+ <label class="mode" data-m="me-first"><b>1. Call me first</b><span class="small">Your cell rings. Press 1, then you're connected to them.</span></label>
+ <label class="mode" data-m="ai-call"><b>2. Have ${CFG.ai} call</b><span class="small">${CFG.ai} makes the call for you.</span>
+  <div id="dyx" hidden><textarea id="cwhy" rows="4" placeholder="What should ${CFG.ai} say or get done? (Type, or click the box and use dictation: press Fn twice on your Mac)"></textarea>
+  <button class="btn plain" id="talkbtn" type="button">🎙 Talk to ${CFG.ai} instead (he calls you to get who and why)</button></div></label>
+ <label class="mode" data-m="connect"><b>3. Connect me with…</b><span class="small">${CFG.ai} calls you, asks who and why, holds you, calls them, then connects you. If they don't answer, he comes back to you.</span></label>
+ <button class="btn green" id="go">Place call</button><div id="cmsg"></div>
+ <h3 style="margin-top:28px">💬 Send a text</h3><textarea id="tbody" rows="3" placeholder="Message"></textarea>
+ <button class="btn primary" id="tgo">Send text</button><div id="tmsg"></div>
+ <p class="small" style="margin-top:20px"><a href="#" id="dncbtn">Add this number to do-not-contact</a></p></div>`;
+ d.style.display="block";d.scrollTop=0;$("#back").onclick=()=>{d.style.display="none";loadLine()};
+ const setM=m=>{cmode=m;d.querySelectorAll(".mode").forEach(x=>x.classList.toggle("on",x.dataset.m==m));$("#dyx").hidden=m!="ai-call"};
+ d.querySelectorAll(".mode").forEach(x=>x.onclick=e=>{if(e.target.closest("#dyx"))return;setM(x.dataset.m)});setM(cmode);
+ const row=(r,star)=>`<div class="rw"><button type="button" class="rr" data-n="${r.n}" data-nm="${esc(r.name)}">${esc(r.name||"No message")}<span>${fmtNum(r.n)}</span></button><button type="button" class="st" data-s="${r.n}" data-nm="${esc(r.name)}" aria-label="${star=="★"?"Remove favorite":"Add favorite"}">${star}</button></div>`;
+ const closeDD=()=>{d.querySelectorAll(".ddb").forEach(b=>b.classList.remove("on"));$("#rec8").hidden=$("#fav8").hidden=true};
+ const isFav=n=>favs.some(f=>f.n==n);
+ const draw=()=>{$("#rec8").innerHTML=recent().map(r=>row(r,isFav(r.n)?"★":"☆")).join("")||'<div class="small" style="padding:12px">No recent numbers yet.</div>';
+  $("#fav8").innerHTML=favs.map(r=>row({n:r.n,name:r.name},"★")).join("")||'<div class="small" style="padding:12px">No favorites yet. Tap ☆ on a recent call.</div>';
+  d.querySelectorAll(".recd .rr").forEach(c=>c.onclick=()=>{$("#cnum").value=fmtNum(c.dataset.n);if(c.dataset.nm)$("#cname").value=c.dataset.nm;closeDD();chk()});
+  d.querySelectorAll(".recd .st").forEach(c=>c.onclick=async e=>{e.stopPropagation();const rm=isFav(c.dataset.s);
+   const r=await fetch("/api/favs",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({number:c.dataset.s,name:c.dataset.nm,remove:rm})});if(r.ok)favs=(await r.json()).favs;draw()})};
+ d.querySelectorAll(".ddb").forEach(b=>b.onclick=()=>{const p=$("#"+b.dataset.p),open=p.hidden;closeDD();if(open){p.hidden=false;b.classList.add("on")}});
+ draw();fetch("/api/favs").then(r=>r.ok?r.json():{favs:[]}).then(j=>{favs=j.favs||[];draw()});
+ const fixName=()=>{const v=$("#cname").value.trim();if(v&&/^[\d\s()+.\-]{7,}$/.test(v)&&v.replace(/\D/g,"").length>=7){if(!$("#cnum").value.trim())$("#cnum").value=fmtNum(v);$("#cname").value="";chk()}};
+ const chk=()=>{const n=e164($("#cnum").value);$("#dncnote").innerHTML=n&&(line.dnc||[]).includes(n)?'<div class="warn">🚫 This number is on the do-not-contact list.</div>':""};$("#cnum").oninput=chk;$("#cname").onblur=fixName;chk();
+ const post=async(u,o)=>{const r=await fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(o)});return r.json().catch(()=>({error:"Something went wrong"}))};
+ const show=(el,j)=>{el.innerHTML=j.error?`<p class="err">${esc(j.error)}</p>`:`<p class="ok">${esc(j.message||"Done.")}</p>`};
+ const place=async mode=>{fixName();const to=e164($("#cnum").value),nm=$("#cname").value.trim(),why=$("#cwhy").value.trim();
+  if(mode!="talk"&&!to)return show($("#cmsg"),{error:"Enter a 10-digit US number."});
+  if(mode=="ai-call"&&!why)return show($("#cmsg"),{error:`Tell ${CFG.ai} what the call is about, or use Talk to ${CFG.ai}.`});
+  const p=await post("/api/call",{mode,to,name:nm,instructions:why,dry_run:true});if(p.error)return show($("#cmsg"),p);
+  const LN={"me-first":"Your cell rings first. Press 1 to connect.","ai-call":`${CFG.ai} will make the call for you.`,connect:`${CFG.ai} calls you first, then connects you.`,talk:`${CFG.ai} calls you first to get who and why.`};
+  if(!(await ask({title:mode=="talk"&&!to?`Talk to ${CFG.ai}?`:`Call ${nm||fmtNum(to)}?`,num:to&&nm?fmtNum(to):"",line:LN[mode],foot:`From ${fmtNum(line.from||CFG.from)} · recorded`,ok:"Call"})))return;
+  show($("#cmsg"),await post("/api/call",{mode,to,name:nm,instructions:why}));setTimeout(refresh,4000)};
+ $("#go").onclick=()=>place(cmode);$("#talkbtn").onclick=e=>{e.preventDefault();place("talk")};
+ $("#tgo").onclick=async()=>{fixName();const to=e164($("#cnum").value),body=$("#tbody").value.trim();if(!to||!body)return show($("#tmsg"),{error:"Enter a number and a message."});
+  const p=await post("/api/text",{to,body,dry_run:true});if(p.error)return show($("#tmsg"),p);
+  const tn=$("#cname").value.trim();if(!(await ask({title:`Send this text to ${tn||fmtNum(to)}?`,num:tn?fmtNum(to):"",preview:body,foot:`From ${fmtNum(p.would.from)}`,ok:"Send",okc:"primary"})))return;
+  const j=await post("/api/text",{to,body});show($("#tmsg"),j.error?j:{message:"Text sent."});if(!j.error)$("#tbody").value="";setTimeout(refresh,3000)};
+ $("#dncbtn").onclick=async e=>{e.preventDefault();const n=e164($("#cnum").value);if(!n)return;if(!(await ask({title:"Add to do-not-contact?",num:fmtNum(n),line:"Calls and texts to this number will be blocked.",ok:"Add",okc:"primary"})))return;
+  const j=await post("/api/dnc",{number:n});if(j.dnc)line.dnc=j.dnc;chk()};}
+$("#callbtn").onclick=()=>callScreen("","");
+async function refresh(){const r=await fetch("/api/messages");if(r.ok){all=(await r.json()).messages;render()}loadLine()}
+$("#tests").onclick=e=>{showTests=!showTests;e.target.classList.toggle("on",showTests);render()};$("#q").oninput=render;
+(async()=>{const r=await fetch("/api/messages");if(r.status==401){$("#login").hidden=false;if(location.search.includes("bad"))$("#bad").hidden=false;return}
+ all=(await r.json()).messages;$("#app").hidden=false;render();loadLine();})();
+if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");
+</script></body></html>

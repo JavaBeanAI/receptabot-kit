@@ -1,0 +1,1 @@
+Hi, thanks for calling {{BUSINESS_NAME}}! I'm {{RECEPTIONIST_NAME}}, the team's AI assistant. This call may be recorded so we get your message right. How can I help you today?

@@ -1,0 +1,36 @@
+# Copy to wrangler.toml and fill in the <...> values.
+name = "<your-app-name>"            # e.g. "my-calls-app"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+account_id = "<YOUR_CLOUDFLARE_ACCOUNT_ID>"
+workers_dev = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "DB"
+id = "<KV_NAMESPACE_ID>"            # from: npx wrangler kv namespace create DB
+
+[vars]
+APP_TITLE = "Calls"                 # name shown at the top of the app
+OWNER_NAME = "<Your first name>"
+BUSINESS_NAME = "<Your business name>"
+TEAM_NAME = "<Your business name> team"
+RECEPTIONIST_NAME = "<Receptionist name>"           # e.g. "Ava"
+RECEPTIONIST_NUMBER_DISPLAY = "<(555) 555-0100>"   # shown in the header; optional
+AI_CALLER_NAME = "<AI caller name>"                # name of the AI that places calls
+APP_NUMBER = "<+15555550101>"       # the Twilio number the app calls/texts from
+TIMEZONE = "America/New_York"
+TIMEZONE_LABEL = "ET"
+XAI_CONVERSATIONS_URL = ""          # optional: link to your agent's Conversations tab in console.x.ai
+XAI_TEAM_CONVERSATIONS_URL = ""     # optional: same for a second (team) agent
+ALLOWED_EMAILS = ""                 # only used if you turn on Cloudflare Access (optional)
+TEAM_DOMAIN = ""
+ACCESS_AUD = ""
+# OWNER_CELL is set as a secret (wrangler secret put OWNER_CELL) so it isn't in your repo.
+
+[[services]]
+binding = "BRIDGE"
+service = "<your-bridge-name>"      # must match name in bridge/wrangler.toml
