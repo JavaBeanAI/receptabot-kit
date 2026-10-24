@@ -1,0 +1,7 @@
+wrangler.toml
+.env
+.dev.vars
+node_modules/
+.wrangler/
+*.bak*
+state/
