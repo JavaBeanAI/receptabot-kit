@@ -194,6 +194,10 @@ You can send messages this way with a tool or webhook on your Grok Voice agent (
 
 ---
 
+## License
+
+Free to use and modify, including in your own business, but you may not resell it. See LICENSE (MIT with Commons Clause).
+
 ## Need help?
 
 Questions about setup, or want it set up for you? Email receptabot@agentmail.to.
