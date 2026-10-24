@@ -153,7 +153,11 @@ The bridge does not store the words the receptionist hears. Your ReceptaBot (a G
 
 If the voice agent cannot call a web address, ask your ReceptaBot to read new conversations from the xAI console and write the messages into the chat.
 
-### 6. Test
+### 6. Forward missed calls from your cell
+
+Your cell can send calls you miss, decline, or can't take to the receptionist number. Your phone still rings first. Follow [Forward your cell's missed calls to the receptionist](#forward-your-cells-missed-calls-to-the-receptionist).
+
+### 7. Test
 
 1. Open `https://<your-bridge>.workers.dev/health`. You should see `{"ok": true}`.
 2. From another phone, call your receptionist number, leave a message, and say it's urgent. The AI should answer, take the message, and ask if there's anything else before saying goodbye.
@@ -293,7 +297,11 @@ Before you change a number that's already in use, take a screenshot of its setti
 
 The bridge adds outgoing calls, texts, and callbacks to the app on its own. Messages the receptionist takes on incoming calls are not in the bridge. Point the voice agent's tool or webhook at the app, using the steps in **How messages get into the app** below.
 
-### 9. Test
+### 9. Forward missed calls from your cell
+
+Your cell can send calls you miss, decline, or can't take to Number A, the receptionist number. Your phone still rings first. Follow [Forward your cell's missed calls to the receptionist](#forward-your-cells-missed-calls-to-the-receptionist).
+
+### 10. Test
 
 1. Open `https://<your-bridge>.workers.dev/health`. You should see `{"ok": true}`.
 2. Open the app address on your phone, enter your passcode, and add it to your home screen.
@@ -343,7 +351,71 @@ Start here if the receptionist is already working and you now want the Calls app
 10. Switch message delivery to the app, or send to both places.
    - **App:** point the voice agent tool at `https://<your-app>.workers.dev/api/messages` with `Authorization: Bearer` and your `INGEST_TOKEN`. Details are in **How messages get into the app**.
    - **Both:** if the tool can call two addresses, keep the ReceptaBot webhook and also call the app address. The Calls app then shows the message, and your ReceptaBot chat still gets it.
-11. Open the app on your phone, enter the passcode, and add it to your home screen. Then run the tests in step 9 under Receptionist + Calls app.
+11. Open the app on your phone, enter the passcode, and add it to your home screen. Then run the tests in step 10 under Receptionist + Calls app.
+
+---
+
+## Forward your cell's missed calls to the receptionist
+
+This sends calls you miss, decline, or can't take (your phone is off, or it has no signal) on your existing cell to your receptionist's Twilio number. Callers reach the receptionist instead of your voicemail. Your cell still rings first, so you can answer when you want to.
+
+This is not "send every call." Do not turn on a setting that forwards all calls. If you do, your cell will not ring at all.
+
+Use the receptionist number you bought above (Number A if you have two numbers). You will need its 10 digits. Some codes also want a `1` in front of those 10 digits.
+
+Turning this on usually costs nothing extra, but a forwarded call can still count on your plan the way a normal call does. Check your plan. [Verizon](https://www.verizon.com/support/call-forwarding-faqs/) says most plans have no monthly fee, and some older plans do. If you do not have unlimited minutes, Verizon bills the forwarded call as if you answered it. [AT&T](https://www.att.com/support/article/wireless/KM1011513/) bills the length of the forwarded call, and long distance or roaming can apply.
+
+### T-Mobile
+
+You may see `**004*` plus the number as one code for every missed-call case. T-Mobile's [short-code list](https://www.t-mobile.com/support/plans-features/self-service-short-codes) does not publish that turn-on code. Dial these three codes, one at a time, and press Call after each. If the receptionist number's 10 digits were `5555550100`, the first code would be `**61*15555550100#`.
+
+- You don't answer: `**61*1` + the 10 digits + `#`
+- Your line is busy: `**67*1` + the 10 digits + `#`. T-Mobile describes this as when you are already on a call. They do not list a separate code for when you decline.
+- Phone is off or has no signal: `**62*1` + the 10 digits + `#`
+
+To put those three back to T-Mobile's usual setting (often voicemail), dial `##004#` and press Call. T-Mobile's [calling troubleshooting page](https://www.t-mobile.com/support/devices/device-troubleshooting/cant-call-dropped-calls-and-other-calling-issues) says that resets busy, unreachable, and no-answer forwarding. It does not turn off "forward every call." To turn off just one of the three, dial `##61#`, `##67#`, or `##62#`.
+
+Do not dial `**21*` plus the number. That forwards every call, and your phone will not ring. If you turned that on, dial `##21#` to turn it off.
+
+Some plans do not support every short code. If a code does nothing, check T-Mobile's page or call them.
+
+### AT&T
+
+AT&T's wireless help does not publish the T-Mobile codes above. The dial code on AT&T's [call forwarding article](https://www.att.com/device-support/article/147973/) forwards every call: dial `*21*`, then the 10-digit number, then `#` (their example looks like `*21*1234567890#`). Dial `#21#` to turn that off. Do not use it for this. Your cell would stop ringing.
+
+On many phones, AT&T's [device steps](https://www.att.com/device-support/article/140337/) show separate choices. Use these three, and enter the receptionist number for each:
+
+- **When unanswered** — you don't pick up
+- **When busy** — you are already on a call
+- **When unreachable** — the phone is off, in airplane mode, or has no signal
+
+Do not turn on **Always forward**. That sends every call away.
+
+AT&T says you can change this only from the phone, not on the website. More is on their [call forwarding page](https://www.att.com/support/article/wireless/KM1011513/). If your phone does not show those three choices, check that page or call AT&T.
+
+### Verizon
+
+Verizon's missed-call feature is called conditional call forwarding (no answer / busy). From your Verizon cell, dial `*71` and then the 10-digit receptionist number, with no `1` in front, and press Call. If that number were `5555550100`, you would dial `*715555550100`. Wait for the beeps and let the call end by itself.
+
+Verizon says this sends the call on when you are busy or you do not answer after about 3 to 6 rings, instead of voicemail. Their page does not list a separate code for a phone that is off or has no signal. If you need that case, check [Verizon's turn-on page](https://www.verizon.com/support/knowledge-base-181139/) or call Verizon.
+
+Verizon also says you can turn on this no-answer/busy forwarding in the My Verizon app. Steps are in [Verizon's call forwarding article](https://www.verizon.com/articles/verizon-unlimited-plans/call-forwarding-everything-you-need-to-know/).
+
+Do not dial `*72`. That forwards every call, and your phone will not ring.
+
+To turn forwarding off, dial `*73` and wait for the confirmation. Details are on [Verizon's turn-off page](https://www.verizon.com/support/knowledge-base-17268/) and the [call forwarding FAQs](https://www.verizon.com/support/call-forwarding-faqs/).
+
+### Other carriers, or a prepaid phone
+
+Check that carrier's call forwarding help page, or call them. Ask for forwarding when you do not answer, when you are busy or you decline, and when the phone is off or has no signal. Ask them not to forward every call.
+
+### iPhone
+
+On an iPhone, **Settings > Phone > Call Forwarding** forwards all calls. On a newer iPhone the same switch is under **Settings > Apps > Phone > Call Forwarding**. That is not what you want: your cell would not ring. Apple's [call forwarding guide](https://support.apple.com/guide/iphone/set-up-call-forwarding-iph7405291c4/ios) says to ask your carrier if you want forwarding only when the line is busy or not in service. Use the carrier steps above instead of that switch.
+
+### Try it
+
+From another phone, call your cell and decline. The receptionist should answer, not your voicemail. Then call your cell and answer, to confirm your phone still rings.
 
 ---
 
